@@ -1,0 +1,38 @@
+name: Publish Flutter Images
+
+on:
+  release:
+    types: [ published ]
+  push:
+    branches:
+      - develop
+
+jobs:
+  publish:
+    name: Push Flutter Image to Docker Hub
+    runs-on: ubuntu-latest
+    container:
+      image: docker:stable-git
+    strategy:
+      matrix:
+        api: [34]
+        include:
+          - api: 34
+            build_tools: "34.0.0"
+            cmdtools: 10406996
+            dart_version: "3.2.1"
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - name: Get release name
+        uses: olegtarasov/get-tag@v2.1.2
+        id: tagName
+      - name: Build and push Flutter image
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          GIT_REF: ${{ github.ref }}
+          RELEASE_NAME: ${{ steps.tagName.outputs.tag }}
+        run: |
+          chmod +x build.sh
+          ./build.sh --build --deploy --android-api ${{ matrix.api }} --build-tools ${{ matrix.build_tools }} --cmdtools ${{ matrix.cmdtools }} --dart --dart-version ${{ matrix.dart_version }}

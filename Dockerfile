@@ -29,6 +29,22 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   wget \
   zlib1g-dev
 
+
+## Install Dart
+ARG dart=false
+ARG dart_sdk=/usr/lib/dart
+ARG dart_version=3.2.1
+RUN if [ $dart = true ] ; \
+  then \
+    echo "Installing Dart SDK"; \
+    mkdir -p ${dart_sdk} && \
+    wget --quiet --output-document=/tmp/dartsdk-linux-x64-release.zip https://storage.googleapis.com/dart-archive/channels/stable/release/${dart_version}/sdk/dartsdk-linux-x64-release.zip && \
+    unzip -q /tmp/dartsdk-linux-x64-release.zip -d ${dart_sdk} && \
+    rm /tmp/dartsdk-linux-x64-release.zip ; \
+  else \
+    echo "Skipping Dart SDK installation" ; \
+  fi
+
 ## Clean dependencies
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
@@ -65,18 +81,20 @@ RUN rbenv global 3.1.1
 RUN gem install bundler:2.3.7
 
 ## Install Android SDK
-ARG sdk_version=commandlinetools-linux-10406996_latest.zip
+ARG android_cmdtools=commandlinetools-linux-10406996_latest.zip
 ARG android_home=/opt/android/sdk
 ARG android_api=android-34
 ARG android_build_tools=34.0.0
 RUN mkdir -p ${android_home} && \
-    wget --quiet --output-document=/tmp/${sdk_version} https://dl.google.com/android/repository/${sdk_version} && \
-    unzip -q /tmp/${sdk_version} -d ${android_home} && \
-    rm /tmp/${sdk_version}
+    wget --quiet --output-document=/tmp/${android_cmdtools} https://dl.google.com/android/repository/${android_cmdtools} && \
+    unzip -q /tmp/${android_cmdtools} -d ${android_home} && \
+    rm /tmp/${android_cmdtools}
 
 ## Set environment variables
 ENV ANDROID_HOME ${android_home}
 ENV PATH=${ANDROID_HOME}/emulator:${ANDROID_HOME}/cmdline-tools:${ANDROID_HOME}/cmdline-tools/bin:${ANDROID_HOME}/platform-tools:${PATH}
+ENV PATH=${dart_sdk}/dart-sdk/bin:${PATH}
+ENV PATH $PATH:~/.pub-cache/bin
 
 ## Setup Android SDK
 RUN mkdir ~/.android && echo '### User Sources for Android SDK Manager' > ~/.android/repositories.cfg
@@ -85,3 +103,11 @@ RUN sdkmanager --sdk_root=$ANDROID_HOME --install \
   "platform-tools" \
   "build-tools;${android_build_tools}" \
   "platforms;${android_api}"
+
+## Install FVM
+RUN if [ $dart = true ] ; \
+  then \
+    dart pub global activate fvm ; \
+  else \
+    echo "Skipping FVM installation" ; \
+  fi

@@ -23,7 +23,7 @@ The Flutter image contains the following software:
 * rbenv
 
 ### Container Registry
-The images are available on [Docker Hub](https://hub.docker.com/r/mylittlesuite/mobile-ci).
+The images are available on [Docker Hub](https://hub.docker.com/r/mylittlesuite/mobile_ci).
 
 ### License
 This project is licensed under the terms of the [GNU GPLv3 license](https://choosealicense.com/licenses/gpl-3.0/).
