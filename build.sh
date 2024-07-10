@@ -6,7 +6,7 @@ set -e
 # Usage of this script
 program_name=$0
 usage () {
-  echo "usage: $program_name [--android-api 34] [--build-tools "34.0.0"] [--cmdtools 10406996] [--build] [--deploy]"
+  echo "usage: $program_name [--android-api 35] [--build-tools "35.0.0"] [--cmdtools 11076708] [--build] [--deploy]"
   echo "  --android-api <androidVersion> Use specific Android version from \`sdkmanager --list\`"
   echo "  --build-tools <version>        Use specific build tools version"
   echo "  --cmdtools <version>           Use specific command-line tools version"

@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 SHELL ["/bin/bash", "-c"]
 
@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 ## Install Dart
 ARG dart=false
 ARG dart_sdk=/usr/lib/dart
-ARG dart_version=3.2.1
+ARG dart_version=3.4.4
 RUN if [ $dart = true ] ; \
   then \
     echo "Installing Dart SDK"; \
@@ -81,10 +81,10 @@ RUN rbenv global 3.1.1
 RUN gem install bundler:2.3.7
 
 ## Install Android SDK
-ARG android_cmdtools=commandlinetools-linux-10406996_latest.zip
+ARG android_cmdtools=commandlinetools-linux-11076708_latest.zip
 ARG android_home=/opt/android/sdk
-ARG android_api=android-34
-ARG android_build_tools=34.0.0
+ARG android_api=android-35
+ARG android_build_tools=35.0.0
 RUN mkdir -p ${android_home} && \
     wget --quiet --output-document=/tmp/${android_cmdtools} https://dl.google.com/android/repository/${android_cmdtools} && \
     unzip -q /tmp/${android_cmdtools} -d ${android_home} && \

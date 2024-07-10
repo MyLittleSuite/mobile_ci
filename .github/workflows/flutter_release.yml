@@ -15,12 +15,16 @@ jobs:
       image: docker:stable-git
     strategy:
       matrix:
-        api: [34]
+        api: [34, 35]
         include:
           - api: 34
             build_tools: "34.0.0"
             cmdtools: 10406996
             dart_version: "3.2.1"
+          - api: 35
+            build_tools: "35.0.0"
+            cmdtools: 11076708
+            dart_version: "3.4.4"
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
