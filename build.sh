@@ -6,14 +6,14 @@ set -e
 # Usage of this script
 program_name=$0
 usage () {
-  echo "usage: $program_name [--android-api 35] [--build-tools "35.0.0"] [--cmdtools 11076708] [--build] [--deploy]"
+  echo "usage: $program_name [--android-api 35] [--build-tools "35.0.0"] [--cmdtools 11076708] [--dart] [--dart-arch x64] [--dart-version 3.7.3] [--arch amd64] [--build] [--deploy]"
   echo "  --android-api <androidVersion> Use specific Android version from \`sdkmanager --list\`"
   echo "  --build-tools <version>        Use specific build tools version"
   echo "  --cmdtools <version>           Use specific command-line tools version"
   echo "  --dart                         Install Dart SDK"
   echo "  --dart-arch <arch>             Use specific dart architecture (x64, arm64)"
   echo "  --dart-version <version>       Use specific dart version"
-  echo "  --java-arch <arch>             Use specific Java architecture (x64, arm64)"
+  echo "  --arch <arch>                  Use specific architecture (amd64, arm64)"
   echo "  --build                        Build image"
   echo "  --deploy                       Deploy image"
   exit 1
@@ -30,7 +30,7 @@ while true; do
     --dart ) dart=true; shift ;;
     --dart-arch ) dart_arch="$2"; shift 2 ;;
     --dart-version ) dart_version="$2"; shift 2 ;;
-    --java-arch ) java_arch="$2"; shift 2 ;;
+    --arch ) arch="$2"; shift 2 ;;
     --build ) build=true; shift ;;
     --deploy ) deploy=true; shift ;;
     * ) break ;;
@@ -52,8 +52,8 @@ if [ -z "$android_cmdtools" ]; then
   usage
 fi
 
-if [ -z "$java_arch" ]; then
-  echo "Missing --java-arch parameter"
+if [ -z "$arch" ]; then
+  echo "Missing --arch parameter"
   usage
 fi
 
@@ -71,7 +71,7 @@ if [ -n "$RELEASE_NAME" ]; then
   simple_image_name="$simple_image_name-$RELEASE_NAME"
 fi
 
-full_image_name="$org_name/mobile_ci:$simple_image_name"
+full_image_name="$org_name/mobile_ci:$simple_image_name-$arch"
 
 # CI business
 tasks=0
@@ -90,7 +90,7 @@ if [ "$build" = true ]; then
     --build-arg android_cmdtools=commandlinetools-linux-$android_cmdtools\_latest.zip \
     --build-arg dart="$dart" \
     $dart_arch_and_version_build_arg \
-    --build-arg java_arch=$java_arch \
+    --build-arg arch=$arch \
     --tag $full_image_name .
   set +x
 fi
