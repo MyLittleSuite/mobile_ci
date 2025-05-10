@@ -57,14 +57,15 @@ ENV PATH "$PATH:$RBENV_ROOT/bin"
 ENV PATH "$PATH:$RBENV_ROOT/shims"
 
 ## Install jenv
+ARG java_arch=amd64
 ENV JENV_ROOT "$HOME/.jenv"
 RUN git clone https://github.com/jenv/jenv.git $JENV_ROOT
 ENV PATH "$PATH:$JENV_ROOT/bin"
 RUN mkdir $JENV_ROOT/versions
-ENV JDK_ROOT "/usr/lib/jvm/"
-RUN jenv add ${JDK_ROOT}/java-8-openjdk-amd64
-RUN jenv add ${JDK_ROOT}/java-11-openjdk-amd64
-RUN jenv add ${JDK_ROOT}/java-17-openjdk-amd64
+ENV JDK_ROOT "/usr/lib/jvm"
+RUN jenv add ${JDK_ROOT}/java-8-openjdk-${java_arch}
+RUN jenv add ${JDK_ROOT}/java-11-openjdk-${java_arch}
+RUN jenv add ${JDK_ROOT}/java-17-openjdk-${java_arch}
 RUN echo 'export PATH="$JENV_ROOT/bin:$PATH"' >> ~/.bashrc
 RUN echo 'eval "$(jenv init -)"' >> ~/.bashrc
 
