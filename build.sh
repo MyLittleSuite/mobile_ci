@@ -11,7 +11,9 @@ usage () {
   echo "  --build-tools <version>        Use specific build tools version"
   echo "  --cmdtools <version>           Use specific command-line tools version"
   echo "  --dart                         Install Dart SDK"
+  echo "  --dart-arch <arch>             Use specific dart architecture (x64, arm64)"
   echo "  --dart-version <version>       Use specific dart version"
+  echo "  --java-arch <arch>             Use specific Java architecture (x64, arm64)"
   echo "  --build                        Build image"
   echo "  --deploy                       Deploy image"
   exit 1
@@ -26,7 +28,9 @@ while true; do
     --build-tools ) android_build_tools="$2"; shift 2 ;;
     --cmdtools ) android_cmdtools="$2"; shift 2 ;;
     --dart ) dart=true; shift ;;
+    --dart-arch ) dart_arch="$2"; shift 2 ;;
     --dart-version ) dart_version="$2"; shift 2 ;;
+    --java-arch ) java_arch="$2"; shift 2 ;;
     --build ) build=true; shift ;;
     --deploy ) deploy=true; shift ;;
     * ) break ;;
@@ -45,6 +49,11 @@ fi
 
 if [ -z "$android_cmdtools" ]; then
   echo "Missing --cmdtools parameter"
+  usage
+fi
+
+if [ -z "$java_arch" ]; then
+  echo "Missing --java-arch parameter"
   usage
 fi
 
@@ -70,9 +79,9 @@ if [ "$build" = true ]; then
   tasks=$((tasks+1))
 
   if [ -n "$dart_version" ]; then
-    dart_version_build_arg="--build-arg dart_version=$dart_version"
+    dart_arch_and_version_build_arg="--build-arg dart_arch=$dart_arch --build-arg dart_version=$dart_version"
   fi
-  echo $dart_version_build_arg
+  echo $dart_arch_and_version_build_arg
 
   set -x
   docker build \
@@ -80,7 +89,8 @@ if [ "$build" = true ]; then
     --build-arg android_build_tools="$android_build_tools" \
     --build-arg android_cmdtools=commandlinetools-linux-$android_cmdtools\_latest.zip \
     --build-arg dart="$dart" \
-    $dart_version_build_arg \
+    $dart_arch_and_version_build_arg \
+    --build-arg java_arch=$java_arch \
     --tag $full_image_name .
   set +x
 fi

@@ -10,19 +10,18 @@ on:
 jobs:
   publish:
     name: Push Android Image to Docker Hub
-    runs-on: ubuntu-latest
-    container:
-      image: docker:stable-git
+    runs-on: ${{ matrix.arch == 'x64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     strategy:
       matrix:
         api: [34, 35]
+        arch: [x64, arm64]
         include:
           - api: 34
             build_tools: "34.0.0"
             cmdtools: 10406996
           - api: 35
             build_tools: "35.0.0"
-            cmdtools: 11076708
+            cmdtools: 13114758
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -37,4 +36,4 @@ jobs:
           RELEASE_NAME: ${{ steps.tagName.outputs.tag }}
         run: |
           chmod +x build.sh
-          ./build.sh --build --deploy --android-api ${{ matrix.api }} --build-tools ${{ matrix.build_tools }} --cmdtools ${{ matrix.cmdtools }}
+          ./build.sh --build --deploy --android-api ${{ matrix.api }} --build-tools ${{ matrix.build_tools }} --cmdtools ${{ matrix.cmdtools }} --java-arch ${{ matrix.arch == 'x64' && 'amd64' || 'arm64' }}

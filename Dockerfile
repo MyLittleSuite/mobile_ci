@@ -32,15 +32,16 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 ## Install Dart
 ARG dart=false
+ARG dart_arch=x64
 ARG dart_sdk=/usr/lib/dart
 ARG dart_version=3.4.4
 RUN if [ $dart = true ] ; \
   then \
     echo "Installing Dart SDK"; \
     mkdir -p ${dart_sdk} && \
-    wget --quiet --output-document=/tmp/dartsdk-linux-x64-release.zip https://storage.googleapis.com/dart-archive/channels/stable/release/${dart_version}/sdk/dartsdk-linux-x64-release.zip && \
-    unzip -q /tmp/dartsdk-linux-x64-release.zip -d ${dart_sdk} && \
-    rm /tmp/dartsdk-linux-x64-release.zip ; \
+    wget --quiet --output-document=/tmp/dartsdk-linux-${dart_arch}-release.zip https://storage.googleapis.com/dart-archive/channels/stable/release/${dart_version}/sdk/dartsdk-linux-${dart_arch}-release.zip && \
+    unzip -q /tmp/dartsdk-linux-${dart_arch}-release.zip -d ${dart_sdk} && \
+    rm /tmp/dartsdk-linux-${dart_arch}-release.zip ; \
   else \
     echo "Skipping Dart SDK installation" ; \
   fi
@@ -56,14 +57,15 @@ ENV PATH "$PATH:$RBENV_ROOT/bin"
 ENV PATH "$PATH:$RBENV_ROOT/shims"
 
 ## Install jenv
+ARG java_arch=amd64
 ENV JENV_ROOT "$HOME/.jenv"
 RUN git clone https://github.com/jenv/jenv.git $JENV_ROOT
 ENV PATH "$PATH:$JENV_ROOT/bin"
 RUN mkdir $JENV_ROOT/versions
-ENV JDK_ROOT "/usr/lib/jvm/"
-RUN jenv add ${JDK_ROOT}/java-8-openjdk-amd64
-RUN jenv add ${JDK_ROOT}/java-11-openjdk-amd64
-RUN jenv add ${JDK_ROOT}/java-17-openjdk-amd64
+ENV JDK_ROOT "/usr/lib/jvm"
+RUN jenv add ${JDK_ROOT}/java-8-openjdk-${java_arch}
+RUN jenv add ${JDK_ROOT}/java-11-openjdk-${java_arch}
+RUN jenv add ${JDK_ROOT}/java-17-openjdk-${java_arch}
 RUN echo 'export PATH="$JENV_ROOT/bin:$PATH"' >> ~/.bashrc
 RUN echo 'eval "$(jenv init -)"' >> ~/.bashrc
 
