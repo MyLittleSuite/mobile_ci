@@ -4,6 +4,8 @@ on:
   release:
     types: [ published ]
   push:
+    branches:
+      - develop
 
 jobs:
   publish:
@@ -38,4 +40,4 @@ jobs:
           RELEASE_NAME: ${{ steps.tagName.outputs.tag }}
         run: |
           chmod +x build.sh
-          ./build.sh --build --android-api ${{ matrix.api }} --build-tools ${{ matrix.build_tools }} --cmdtools ${{ matrix.cmdtools }} --java-arch ${{ matrix.java_arch }}
+          ./build.sh --build --deploy --android-api ${{ matrix.api }} --build-tools ${{ matrix.build_tools }} --cmdtools ${{ matrix.cmdtools }} --java-arch ${{ matrix.java_arch }}
