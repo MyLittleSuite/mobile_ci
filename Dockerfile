@@ -34,7 +34,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 ARG dart=false
 ARG dart_arch=x64
 ARG dart_sdk=/usr/lib/dart
-ARG dart_version=3.4.4
+ARG dart_version=3.8.1
 RUN if [ $dart = true ] ; \
   then \
     echo "Installing Dart SDK"; \
@@ -83,18 +83,19 @@ RUN rbenv global 3.1.1
 RUN gem install bundler:2.3.7
 
 ## Install Android SDK
-ARG android_cmdtools=commandlinetools-linux-11076708_latest.zip
+ARG android_cmdtools=commandlinetools-linux-13114758_latest.zip
 ARG android_home=/opt/android/sdk
-ARG android_api=android-35
-ARG android_build_tools=35.0.0
-RUN mkdir -p ${android_home} && \
+ARG android_api=android-36
+ARG android_build_tools=36.0.0
+RUN mkdir -p ${android_home}/cmdline-tools && \
     wget --quiet --output-document=/tmp/${android_cmdtools} https://dl.google.com/android/repository/${android_cmdtools} && \
-    unzip -q /tmp/${android_cmdtools} -d ${android_home} && \
+    unzip -q /tmp/${android_cmdtools} -d ${android_home}/cmdline-tools && \
+    mv ${android_home}/cmdline-tools/cmdline-tools ${android_home}/cmdline-tools/latest && \
     rm /tmp/${android_cmdtools}
 
 ## Set environment variables
 ENV ANDROID_HOME ${android_home}
-ENV PATH=${ANDROID_HOME}/emulator:${ANDROID_HOME}/cmdline-tools:${ANDROID_HOME}/cmdline-tools/bin:${ANDROID_HOME}/platform-tools:${PATH}
+ENV PATH=${ANDROID_HOME}/emulator:${ANDROID_HOME}/cmdline-tools/latest:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${PATH}
 ENV PATH=${dart_sdk}/dart-sdk/bin:${PATH}
 ENV PATH $PATH:~/.pub-cache/bin
 

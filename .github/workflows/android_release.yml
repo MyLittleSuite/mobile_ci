@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.arch == 'x64' && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
     strategy:
       matrix:
-        api: [34, 35]
+        api: [34, 35, 36]
         arch: [x64, arm64]
         include:
           - api: 34
@@ -21,6 +21,9 @@ jobs:
             cmdtools: 10406996
           - api: 35
             build_tools: "35.0.0"
+            cmdtools: 13114758
+          - api: 36
+            build_tools: "36.0.0"
             cmdtools: 13114758
     steps:
       - name: Check out the repo
@@ -45,7 +48,7 @@ jobs:
       - publish
     strategy:
       matrix:
-        api: [34, 35]
+        api: [34, 35, 36]
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4

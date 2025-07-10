@@ -6,7 +6,7 @@ set -e
 # Usage of this script
 program_name=$0
 usage () {
-  echo "usage: $program_name [--android-api 35] [--build-tools "35.0.0"] [--cmdtools 11076708] [--dart] [--dart-arch x64] [--dart-version 3.7.3] [--arch amd64] [--build] [--deploy]"
+  echo "usage: $program_name [--android-api 36] [--build-tools "36.0.0"] [--cmdtools 13114758] [--dart] [--dart-arch x64] [--dart-version 3.8.1] [--arch amd64] [--build] [--deploy]"
   echo "  --android-api <androidVersion> Use specific Android version from \`sdkmanager --list\`"
   echo "  --build-tools <version>        Use specific build tools version"
   echo "  --cmdtools <version>           Use specific command-line tools version"
@@ -85,6 +85,7 @@ if [ "$build" = true ]; then
 
   set -x
   docker build \
+    --network=host \
     --build-arg android_api=android-$android_api \
     --build-arg android_build_tools="$android_build_tools" \
     --build-arg android_cmdtools=commandlinetools-linux-$android_cmdtools\_latest.zip \
