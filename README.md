@@ -22,6 +22,21 @@ The Flutter image contains the following software:
 * jenv
 * rbenv
 
+### Flutter Test
+A lean image for `flutter test`/`flutter analyze` CI jobs — no Android SDK, no Java, no Ruby. Contains:
+* Dart
+* FVM
+* lcov
+* libsqlite3-dev
+* junitreport
+
+### Building locally
+```sh
+./build.sh --target android|flutter-test [--build] [--deploy] [options...]
+./build.sh --help
+```
+`--target` defaults to `android`. See `--help` for the full list of options.
+
 ### Container Registry
 The images are available on [Docker Hub](https://hub.docker.com/r/mylittlesuite/mobile_ci).
 

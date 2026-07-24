@@ -1,0 +1,71 @@
+name: Publish Images
+
+on:
+  release:
+    types: [ published ]
+  push:
+    branches:
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish-android:
+    strategy:
+      matrix:
+        include:
+          - api: 34
+            build_tools: "34.0.0"
+            cmdtools: 10406996
+          - api: 35
+            build_tools: "35.0.0"
+            cmdtools: 13114758
+          - api: 36
+            build_tools: "36.0.0"
+            cmdtools: 13114758
+    uses: ./.github/workflows/_publish-image.yml
+    with:
+      target: android
+      android_api: ${{ matrix.api }}
+      build_tools: ${{ matrix.build_tools }}
+      cmdtools: ${{ matrix.cmdtools }}
+    secrets: inherit
+
+  publish-flutter:
+    strategy:
+      matrix:
+        include:
+          - api: 34
+            build_tools: "34.0.0"
+            cmdtools: 10406996
+            dart_version: "3.2.1"
+          - api: 35
+            build_tools: "35.0.0"
+            cmdtools: 13114758
+            dart_version: "3.7.3"
+          - api: 36
+            build_tools: "36.0.0"
+            cmdtools: 13114758
+            dart_version: "3.8.1"
+    uses: ./.github/workflows/_publish-image.yml
+    with:
+      target: android
+      android_api: ${{ matrix.api }}
+      build_tools: ${{ matrix.build_tools }}
+      cmdtools: ${{ matrix.cmdtools }}
+      dart: true
+      dart_version: ${{ matrix.dart_version }}
+    secrets: inherit
+
+  publish-flutter-test:
+    strategy:
+      matrix:
+        dart_version: ["3.8.1"]
+    uses: ./.github/workflows/_publish-image.yml
+    with:
+      target: flutter-test
+      dart: true
+      dart_version: ${{ matrix.dart_version }}
+    secrets: inherit

@@ -6,10 +6,11 @@ set -e
 # Usage of this script
 program_name=$0
 usage () {
-  echo "usage: $program_name [--android-api 36] [--build-tools "36.0.0"] [--cmdtools 13114758] [--dart] [--dart-arch x64] [--dart-version 3.8.1] [--arch amd64] [--build] [--deploy]"
-  echo "  --android-api <androidVersion> Use specific Android version from \`sdkmanager --list\`"
-  echo "  --build-tools <version>        Use specific build tools version"
-  echo "  --cmdtools <version>           Use specific command-line tools version"
+  echo "usage: $program_name [--target android|flutter-test] [--android-api 36] [--build-tools "36.0.0"] [--cmdtools 13114758] [--dart] [--dart-arch x64] [--dart-version 3.8.1] [--arch amd64] [--build] [--deploy]"
+  echo "  --target <stage>               Dockerfile stage to build: android (default) or flutter-test"
+  echo "  --android-api <androidVersion> Use specific Android version from \`sdkmanager --list\` (android target only)"
+  echo "  --build-tools <version>        Use specific build tools version (android target only)"
+  echo "  --cmdtools <version>           Use specific command-line tools version (android target only)"
   echo "  --dart                         Install Dart SDK"
   echo "  --dart-arch <arch>             Use specific dart architecture (x64, arm64)"
   echo "  --dart-version <version>       Use specific dart version"
@@ -21,9 +22,11 @@ usage () {
 
 # Parameters parsing
 dart=false
+target=android
 
 while true; do
   case "$1" in
+    --target ) target="$2"; shift 2 ;;
     --android-api ) android_api="$2"; shift 2 ;;
     --build-tools ) android_build_tools="$2"; shift 2 ;;
     --cmdtools ) android_cmdtools="$2"; shift 2 ;;
@@ -37,19 +40,26 @@ while true; do
   esac
 done
 
-if [ -z "$android_api" ]; then
-  echo "Missing --android-api parameter"
+if [ "$target" != "android" ] && [ "$target" != "flutter-test" ]; then
+  echo "Invalid --target: $target (expected android or flutter-test)"
   usage
 fi
 
-if [ -z "$android_build_tools" ]; then
-  echo "Missing --build-tools parameter"
-  usage
-fi
+if [ "$target" = "android" ]; then
+  if [ -z "$android_api" ]; then
+    echo "Missing --android-api parameter"
+    usage
+  fi
 
-if [ -z "$android_cmdtools" ]; then
-  echo "Missing --cmdtools parameter"
-  usage
+  if [ -z "$android_build_tools" ]; then
+    echo "Missing --build-tools parameter"
+    usage
+  fi
+
+  if [ -z "$android_cmdtools" ]; then
+    echo "Missing --cmdtools parameter"
+    usage
+  fi
 fi
 
 if [ -z "$arch" ]; then
@@ -59,7 +69,11 @@ fi
 
 # Compute image tag
 org_name="mylittlesuite"
-simple_image_name="android-$android_api"
+if [ "$target" = "flutter-test" ]; then
+  simple_image_name="flutter-test"
+else
+  simple_image_name="android-$android_api"
+fi
 if [ "$dart" = true ]; then
   simple_image_name="$simple_image_name-dart-$dart_version"
 fi
@@ -83,15 +97,23 @@ if [ "$build" = true ]; then
   fi
   echo $dart_arch_and_version_build_arg
 
+  if [ "$target" = "android" ]; then
+    android_build_args="--build-arg android_api=android-$android_api --build-arg android_build_tools=$android_build_tools --build-arg android_cmdtools=commandlinetools-linux-${android_cmdtools}_latest.zip"
+  fi
+
+  cache_scope="$simple_image_name-$arch"
+
   set -x
-  docker build \
+  docker buildx build \
+    --load \
     --network=host \
-    --build-arg android_api=android-$android_api \
-    --build-arg android_build_tools="$android_build_tools" \
-    --build-arg android_cmdtools=commandlinetools-linux-$android_cmdtools\_latest.zip \
+    --target $target \
+    $android_build_args \
     --build-arg dart="$dart" \
     $dart_arch_and_version_build_arg \
     --build-arg arch=$arch \
+    --cache-from "type=gha,scope=$cache_scope" \
+    --cache-to "type=gha,mode=max,scope=$cache_scope" \
     --tag $full_image_name .
   set +x
 fi

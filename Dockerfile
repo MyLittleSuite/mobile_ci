@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:24.04 AS base
 
 SHELL ["/bin/bash", "-c"]
 
@@ -10,9 +10,10 @@ RUN apt-get update && apt-get -y install locales && \
     locale-gen en_US.UTF-8 || true
 ENV LANG=en_US.UTF-8
 
-## Install dependencies
+## Install common dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
   build-essential \
+  ca-certificates \
   curl \
   file \
   git \
@@ -21,14 +22,11 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   libgmp-dev \
   libreadline-dev \
   libssl-dev \
-  openjdk-17-jdk \
-  openjdk-11-jdk \
-  openjdk-8-jdk \
   ssh \
   unzip \
   wget \
-  zlib1g-dev
-
+  zlib1g-dev && \
+  update-ca-certificates
 
 ## Install Dart
 ARG dart=false
@@ -49,6 +47,42 @@ RUN if [ $dart = true ] ; \
 ## Clean dependencies
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
+
+ENV PATH=${dart_sdk}/dart-sdk/bin:${PATH}
+ENV PATH $PATH:~/.pub-cache/bin
+
+## Install FVM
+RUN if [ $dart = true ] ; \
+  then \
+    dart pub global activate fvm ; \
+  else \
+    echo "Skipping FVM installation" ; \
+  fi
+
+FROM base AS flutter-test
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+  lcov \
+  libsqlite3-dev && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN if [ $dart = true ] ; \
+  then \
+    dart pub global activate junitreport ; \
+  else \
+    echo "Skipping junitreport installation" ; \
+  fi
+
+FROM base AS android
+
+## Install Java
+RUN apt-get update && apt-get install --no-install-recommends -y \
+  openjdk-17-jdk \
+  openjdk-11-jdk \
+  openjdk-8-jdk && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 ## Install rbenv
 ENV RBENV_ROOT "/root/.rbenv"
@@ -74,7 +108,7 @@ RUN mkdir -p "$RBENV_ROOT"/plugins
 RUN git clone https://github.com/rbenv/ruby-build.git "$RBENV_ROOT"/plugins/ruby-build
 
 # Install ruby envs
-RUN echo “install: --no-document” > ~/.gemrc
+RUN echo "install: --no-document" > ~/.gemrc
 ENV RUBY_CONFIGURE_OPTS=--disable-install-doc
 RUN rbenv install 3.1.1
 
@@ -96,8 +130,6 @@ RUN mkdir -p ${android_home}/cmdline-tools && \
 ## Set environment variables
 ENV ANDROID_HOME ${android_home}
 ENV PATH=${ANDROID_HOME}/emulator:${ANDROID_HOME}/cmdline-tools/latest:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${PATH}
-ENV PATH=${dart_sdk}/dart-sdk/bin:${PATH}
-ENV PATH $PATH:~/.pub-cache/bin
 
 ## Setup Android SDK
 RUN mkdir ~/.android && echo '### User Sources for Android SDK Manager' > ~/.android/repositories.cfg
@@ -106,11 +138,3 @@ RUN sdkmanager --sdk_root=$ANDROID_HOME --install \
   "platform-tools" \
   "build-tools;${android_build_tools}" \
   "platforms;${android_api}"
-
-## Install FVM
-RUN if [ $dart = true ] ; \
-  then \
-    dart pub global activate fvm ; \
-  else \
-    echo "Skipping FVM installation" ; \
-  fi
