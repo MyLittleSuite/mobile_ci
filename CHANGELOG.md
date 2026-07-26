@@ -1,3 +1,6 @@
+## NEXT
+* Added `Java (OpenJDK)` 21, set as default via `jenv global 21`
+
 ## 1.4.0
 * Added `flutter-test` build target/image: lean Dart+FVM image with `lcov`, `libsqlite3-dev`, `junitreport` baked in, no Android SDK/Java/Ruby — for `flutter test`/`flutter analyze` CI jobs
 * `build.sh`/`manifest.sh` now accept `--target android|flutter-test` (defaults to `android`, unchanged behavior)

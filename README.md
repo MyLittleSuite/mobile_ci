@@ -7,7 +7,7 @@ Strongly inspired from [docker-android](https://github.com/faberNovel/docker-and
 The Android image contains the following software:
 * Android SDK (platform-tools, build-tools, platforms)
 * Bundler
-* Java (OpenJDK 8, 11 and 17)
+* Java (OpenJDK 8, 11, 17 and 21, default 21)
 * jenv
 * rbenv
 
@@ -18,7 +18,7 @@ The Flutter image contains the following software:
 * Dart
 * Flutter
 * FVM
-* Java (OpenJDK 8, 11 and 17)
+* Java (OpenJDK 8, 11, 17 and 21, default 21)
 * jenv
 * rbenv
 
