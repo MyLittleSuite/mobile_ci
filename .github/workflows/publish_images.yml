@@ -25,6 +25,9 @@ jobs:
           - api: 36
             build_tools: "36.0.0"
             cmdtools: 13114758
+          - api: 37
+            build_tools: "37.0.0"
+            cmdtools: 16111833
     uses: ./.github/workflows/_publish-image.yml
     with:
       target: android
@@ -49,6 +52,10 @@ jobs:
             build_tools: "36.0.0"
             cmdtools: 13114758
             dart_version: "3.8.1"
+          - api: 37
+            build_tools: "37.0.0"
+            cmdtools: 16111833
+            dart_version: "3.14.1"
     uses: ./.github/workflows/_publish-image.yml
     with:
       target: android
@@ -62,7 +69,7 @@ jobs:
   publish-flutter-test:
     strategy:
       matrix:
-        dart_version: ["3.8.1"]
+        dart_version: ["3.8.1", "3.14.1"]
     uses: ./.github/workflows/_publish-image.yml
     with:
       target: flutter-test

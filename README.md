@@ -29,6 +29,7 @@ A lean image for `flutter test`/`flutter analyze` CI jobs — no Android SDK, no
 * lcov
 * libsqlite3-dev
 * junitreport
+* [Very Good CLI](https://pub.dev/packages/very_good_cli) (`very_good`; requires Dart >= 3.13, older Dart images get the newest compatible release)
 
 ### Building locally
 ```sh
@@ -36,6 +37,8 @@ A lean image for `flutter test`/`flutter analyze` CI jobs — no Android SDK, no
 ./build.sh --help
 ```
 `--target` defaults to `android`. See `--help` for the full list of options.
+`--print-image` prints the image name that would be built, `manifest.sh` merges the per-arch images into the multi-arch tag.
+Both scripts share `common.sh`, which defines how image tags are computed.
 
 ### Container Registry
 The images are available on [Docker Hub](https://hub.docker.com/r/mylittlesuite/mobile_ci).

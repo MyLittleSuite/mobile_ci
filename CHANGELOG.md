@@ -1,5 +1,17 @@
-## NEXT
+## 1.5.0
 * Added `Java (OpenJDK)` 21, set as default via `jenv global 21`
+* Added `Android API` 37
+* Added `Android build-tools` 37.0.0
+* Added `Android cmdtools` 16111833 (cmdline-tools 23.0) for `Android API` 37
+* Added `Dart version` 3.14.1 for `Android API` 37 and for the `flutter-test` image
+* Added `very_good_cli` to the `flutter-test` image
+* `build.sh` maps `--android-api 37` to the `android-37.0` SDK package (API 37+ platforms are published with a `.0` suffix); the image tag keeps `android-37`
+* Updated `Dockerfile` defaults to API 37, build-tools 37.0.0, cmdtools 16111833, Dart 3.14.1
+* Rewrote `build.sh` and `manifest.sh` (same flags, same image tags): shared `common.sh` is now the single place that computes image names/tags and the SDK platform name, `set -eu`, unknown flags are rejected instead of ignored, `--arch`/`--dart-arch` default to the host architecture, `--help`, new `--print-image`
+* `build.sh` smoke tests the image (SDK platform/build-tools, Java, Dart, FVM, very_good_cli) after building and before pushing; skip with `--skip-test`
+* `build.sh` uses the GitHub Actions cache only on GitHub runners, so it also works locally
+* The release name is derived from `GIT_REF` (`refs/tags/*`) by the scripts: dropped the `olegtarasov/get-tag` action and the `chmod +x` steps from the workflow
+* Fixed `PATH` containing a literal `~/.pub-cache/bin` (`ENV` does not expand `~`): now `/root/.pub-cache/bin`
 
 ## 1.4.0
 * Added `flutter-test` build target/image: lean Dart+FVM image with `lcov`, `libsqlite3-dev`, `junitreport` baked in, no Android SDK/Java/Ruby — for `flutter test`/`flutter analyze` CI jobs
