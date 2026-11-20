@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 ARG dart=false
 ARG dart_arch=x64
 ARG dart_sdk=/usr/lib/dart
-ARG dart_version=3.8.1
+ARG dart_version=3.14.1
 RUN if [ $dart = true ] ; \
   then \
     echo "Installing Dart SDK"; \
@@ -49,7 +49,8 @@ RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
 ENV PATH=${dart_sdk}/dart-sdk/bin:${PATH}
-ENV PATH $PATH:~/.pub-cache/bin
+## ENV does not expand "~": use the absolute path so non-bash shells find pub global executables
+ENV PATH=${PATH}:/root/.pub-cache/bin
 
 ## Install FVM
 RUN if [ $dart = true ] ; \
@@ -72,6 +73,14 @@ RUN if [ $dart = true ] ; \
     dart pub global activate junitreport ; \
   else \
     echo "Skipping junitreport installation" ; \
+  fi
+
+## Install Very Good CLI (pub resolves the newest release compatible with the installed Dart SDK)
+RUN if [ $dart = true ] ; \
+  then \
+    dart pub global activate very_good_cli ; \
+  else \
+    echo "Skipping very_good_cli installation" ; \
   fi
 
 FROM base AS android
@@ -120,10 +129,10 @@ RUN rbenv global 3.1.1
 RUN gem install bundler:2.3.7
 
 ## Install Android SDK
-ARG android_cmdtools=commandlinetools-linux-13114758_latest.zip
+ARG android_cmdtools=commandlinetools-linux-16111833_latest.zip
 ARG android_home=/opt/android/sdk
-ARG android_api=android-36
-ARG android_build_tools=36.0.0
+ARG android_api=android-37.0
+ARG android_build_tools=37.0.0
 RUN mkdir -p ${android_home}/cmdline-tools && \
     wget --quiet --output-document=/tmp/${android_cmdtools} https://dl.google.com/android/repository/${android_cmdtools} && \
     unzip -q /tmp/${android_cmdtools} -d ${android_home}/cmdline-tools && \
