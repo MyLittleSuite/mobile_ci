@@ -129,7 +129,8 @@ RUN rbenv global 3.1.1
 RUN gem install bundler:2.3.7
 
 ## Install Android SDK
-ARG android_cmdtools=commandlinetools-linux-16111833_latest.zip
+## Do not use cmdline-tools 23.0 (16111833): its sdkmanager delegates to an x86-64 only `android` binary and fails on arm64
+ARG android_cmdtools=commandlinetools-linux-15859902_latest.zip
 ARG android_home=/opt/android/sdk
 ARG android_api=android-37.0
 ARG android_build_tools=37.0.0

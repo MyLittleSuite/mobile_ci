@@ -10,7 +10,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 program_name=$0
 usage() {
   cat <<EOF
-usage: $program_name [--target android|flutter-test] [--android-api 37] [--build-tools 37.0.0] [--cmdtools 16111833]
+usage: $program_name [--target android|flutter-test] [--android-api 37] [--build-tools 37.0.0] [--cmdtools 15859902]
                      [--dart] [--dart-arch x64] [--dart-version 3.14.1] [--arch amd64]
                      [--build] [--deploy] [--skip-test] [--print-image]
   --target <stage>               Dockerfile stage to build: android (default) or flutter-test
